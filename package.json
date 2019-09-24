@@ -7,8 +7,8 @@
   "scripts": {
     "lint": "tslint -p tsconfig.json -t stylish --fix",
     "build": "tsc",
-    "test": "mocha -r ts-node/register ./test/**/*-test.ts",
-    "coverage": "nyc ./node_modules/.bin/mocha"
+    "test": "nyc mocha -r ts-node/register ./test/**/*-test.ts",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "nyc": {
     "include": [
