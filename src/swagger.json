@@ -1,0 +1,436 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Claims",
+    "description": "An API for for testing the claims engine concept.",
+    "version": "v1",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "api.byu.edu",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/claims",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Retrieve Properties",
+        "description": "Retrieves a collection of properties against which claims can be made.",
+        "x-operation": "getConcepts",
+        "tags": [
+          "Claims"
+        ],
+        "responses": {
+          "200": {
+            "description": "A collection of properties",
+            "schema": {
+              "description": "A list of concepts",
+              "type": "object",
+              "required": [
+                "metadata"
+              ],
+              "properties": {
+                "metadata": {
+                  "type": "object",
+                  "required": [
+                    "validation_response"
+                  ],
+                  "properties": {
+                    "validation_response": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "validation_information": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "cache": {
+                      "description": "If data is from live source, value will be null, otherwise it will be date-time of cache",
+                      "type": "object",
+                      "properties": {
+                        "date_time": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "description": "A concept about which a claim may be made",
+                    "type": "object",
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "x-tmplate": ":description"
+                      },
+                      "longDescription": {
+                        "type": "string",
+                        "x-tmplate": ":longDescription"
+                      },
+                      "id": {
+                        "type": "string",
+                        "x-template": ":id"
+                      },
+                      "type": {
+                        "type": "string",
+                        "x-template": ":type"
+                      },
+                      "qualifiers": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-template": ":qualifiers"
+                      },
+                      "relationships": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-template": ":relationships"
+                      }
+                    },
+                    "example": {
+                      "description": "Age Claim",
+                      "longDescription": "An age claim can verify the age of a given packets applicant.",
+                      "id": "subject_exists",
+                      "type": "integer",
+                      "relationships": ["eq", "not_eq"]
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "metadata": {
+                  "validation_response": {
+                    "code": 200,
+                    "message": "Success"
+                  }
+                },
+                "values": [
+                  {
+                    "description": "The subject exists",
+                    "longDescription": "Determines whether a subject is a known entity within the domain.",
+                    "id": "subject_exists",
+                    "type": "boolean",
+                    "relationships": ["eq", "not_eq"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Submit Claim",
+        "description": "Submit a claim for validation",
+        "x-operation": "validateClaims",
+        "tags": [
+          "Claims"
+        ],
+        "parameters": [
+          {
+            "name": "claims",
+            "in": "body",
+            "description": "Claims object",
+            "required": true,
+            "schema": {
+              "description": "An associative array object whose properties are independent claims for the engine to verify",
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string"
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "description": "A claim for the engine to verify",
+                      "type": "object",
+                      "required": [
+                        "value"
+                      ],
+                      "properties": {
+                        "concept": {
+                          "type": "string"
+                        },
+                        "relationship": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "qualifier": {
+                          "type": "object"
+                        }
+                      },
+                      "example": {
+                        "concept": "subject_exists",
+                        "relationship": "eq",
+                        "value": "123456789",
+                        "qualifier": {}
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "claim_id1": {
+                  "subject": "123456789",
+                  "mode": "ALL",
+                  "claims": [
+                    {
+                      "concept": "subject_exists",
+                      "relationship": "eq",
+                      "value": "123456789"
+                    }
+                  ]
+                },
+                "claim_id2": {
+                  "claim_id": "2",
+                  "subject": "987654321",
+                  "mode": "ALL",
+                  "claims": [
+                    {
+                      "concept": "subject_exists",
+                      "relationship": "eq",
+                      "value": "123456789"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful claims response",
+            "schema": {
+              "description": "An associative array object of the responses to the claims in the claim object.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "verified": {
+                    "type": "boolean"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "required": [
+                      "validation_response"
+                    ],
+                    "properties": {
+                      "validation_response": {
+                        "type": "object",
+                        "required": [
+                          "code",
+                          "message"
+                        ],
+                        "properties": {
+                          "code": {
+                            "type": "integer"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "validation_information": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "claim_id1": {
+                  "verified": true,
+                  "metadata": {
+                    "validation_response": {
+                      "code": 200,
+                      "message": "Success"
+                    }
+                  }
+                },
+                "claim_id2": {
+                  "verified": false,
+                  "metadata": {
+                    "validation_response": {
+                      "code": 200,
+                      "message": "Success"
+                    }
+                  }
+                },
+                "claim_id3": {
+                  "metadata": {
+                    "validation_response": {
+                      "code": 400,
+                      "message": "Bad Request"
+                    }
+                  }
+                },
+                "claim_id4": {
+                  "metadata": {
+                    "validation_response": {
+                      "code": 404,
+                      "message": "Not Found"
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "claim_id1": {
+                  "verified": true,
+                  "metadata": {
+                    "validation_response": {
+                      "code": 200,
+                      "message": "Success"
+                    }
+                  }
+                },
+                "claim_id2": {
+                  "verified": false,
+                  "metadata": {
+                    "validation_response": {
+                      "code": 200,
+                      "message": "Success"
+                    }
+                  }
+                },
+                "claim_id3": {
+                  "metadata": {
+                    "validation_response": {
+                      "code": 400,
+                      "message": "Bad Request"
+                    }
+                  }
+                },
+                "claim_id4": {
+                  "metadata": {
+                    "validation_response": {
+                      "code": 404,
+                      "message": "Not Found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request - unable to interpret request",
+            "schema": {
+              "type": "object",
+              "required": [
+                "metadata"
+              ],
+              "properties": {
+                "metadata": {
+                  "type": "object",
+                  "required": [
+                    "validation_response"
+                  ],
+                  "properties": {
+                    "validation_response": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "validation_information": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subject Not Found",
+            "schema": {
+              "type": "object",
+              "required": [
+                "metadata"
+              ],
+              "properties": {
+                "metadata": {
+                  "type": "object",
+                  "required": [
+                    "validation_response"
+                  ],
+                  "properties": {
+                    "validation_response": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "validation_information": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
