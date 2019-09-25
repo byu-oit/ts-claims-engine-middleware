@@ -1,4 +1,4 @@
-import {Concept} from '../../ts-claims-engine';
+import {Concept} from '@byu-oit/ts-claims-engine';
 
 class Food {
     public name: string;
