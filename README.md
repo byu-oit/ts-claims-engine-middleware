@@ -1,6 +1,4 @@
 # ts-claims-engine-middleware
-##### BYU API Claims Adjudicator Middleware.
-
 [![Build Status](https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master)](https://travis-ci.org/byu-oit/ts-claims-engine-middleware)
 [![Coverage Status](https://coveralls.io/repos/github/byu-oit/ts-claims-engine-middleware/badge.svg?branch=master)](https://coveralls.io/github/byu-oit/ts-claims-engine-middleware?branch=master)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/byu-oit/ts-claims-engine-middleware)
@@ -8,17 +6,11 @@
 ## Installation
 `npm i @byu-oit/ts-claims-engine-middleware`
 
-## Related Packages
-* **![Claims Adjudicator Module (CAM)](https://github.com/byu-oit/ts-claims-engine)**
-* **![Claims Adjudicator Middleware](https://github.com/byu-oit/ts-claims-engine-middleware)**
-* **![Claims Adjudicator Client](https://github.com/byu-oit/ts-claims-engine-client)**
-* **![Claims Adjudicator WSO2 Request](https://github.com/byu-oit/ts-wso2-claims-request)**
-
 ## Introduction
-The Claims Adjudicator Middleware is an _![express](https://expressjs.com)_ middleware function. 
-It's intent is to make implementing the CAM as convenient as possible to developers already using the express server framework.
+The Claims Adjudicator Middleware is an _![express](https://expressjs.com)_ middleware function. It's purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
 
 ## Example
+
 ### 1. Define CAM
 ```js
 // adjudicator.js
@@ -33,7 +25,7 @@ const concepts = { // Create concepts
         type: 'boolean',
         relationships: ['eq', 'not_eq'],
         qualifiers: ['age'],
-        getValue: async (id: string, qualifiers) => {
+        getValue: async (id, qualifiers) => {
             if (qualifiers && qualifiers.age) {
                 return subjects[id] !== undefined && subjects[id].age === qualifiers.age
             } else {
@@ -46,14 +38,15 @@ const concepts = { // Create concepts
         longDescription: 'Determine if the subject is of an age',
         type: 'int',
         relationships: ['gt', 'gt_or_eq', 'lt', 'lt_or_eq', 'eq', 'not_eq'],
-        getValue: async (id: string) => subjects[id].age
+        getValue: async (id) => subjects[id].age
     })
 }
 
 export default new ClaimsAdjudicator(concepts) // Export adjudicator instance
 ```
 
-### 2. Define server and pass adjudicator into the adjudicator middleware
+
+### 2. Define server with adjudicator middleware
 ```js
 // app.js
 const express = require('express')
@@ -69,6 +62,7 @@ app.listen(port, () => {
 })
 ```
 
+
 ## API
 
 ### HTTP Responses
@@ -82,6 +76,7 @@ the claim was validated.
 A verification response is a JSON object that can be considered an associative array.
 Each property on the object is a verification response object what has two properties.
 
+```json
     {
         "verified": true,
         "metadata": {
@@ -91,6 +86,7 @@ Each property on the object is a verification response object what has two prope
           }
         }
     }
+```
 
 The metadata property will always be present and must be inspected to determine whether
 an error occurred. If the validation_response code is 200, then the verified property
@@ -101,13 +97,14 @@ The CAM returns two errors:
 * **400** Bad Request - The claim could not be evaluated because of an error in the claim declaration (e.g., an unrecognized concept or relationship).
 * **404** Not Found - The subject ID could not be resolved to a resource.
 
-## Endpoints
+### Endpoints
 
-### GET /
+#### GET /
 
 A GET on the CAM endpoint returns a list of the concept identifiers that can be
 used in claims submitted to this domain.
 
+```json
     {
       "metadata": {
         "validation_response": {
@@ -123,24 +120,28 @@ used in claims submitted to this domain.
         }
       ]
     }
+```
 
 Note: The "type" and "range" properties are hints. The CAM will simply not
 verify a claim if the reference value is nonsensical.
 
-### PUT /
+#### PUT /
 
 A PUT on the CAM endpoint must include a JSON request body that is an associative array
 of one or more independent claims, where the property key is a unique claim identifier
 and the property value is a claim object.
 
+```json
     {
-      "claim1": <claim object>,
-      "claim2": <claim object>,
-      "claim3": <claim object>
+      "claim1": "<claim object>",
+      "claim2": "<claim object>",
+      "claim3": "<claim object>"
     }
+```
 
 Each claim object takes the following form:
 
+```json
     {
       "subject": "123456789",
       "mode": "ALL",
@@ -153,9 +154,11 @@ Each claim object takes the following form:
         }
       ]
     }
+```
 
 An example claim request:
 
+```json
     {
       "claim_id1": {
         "subject": "123456789",
@@ -181,22 +184,25 @@ An example claim request:
         ]
       }
     }
+```
 
-
-### PUT / Response
+#### PUT / Response
 
 The CAM responds with an associative array where each property's key matches the
 key given in the request body and each property's value is a claim response
 object.
 
+```json
     {
-      "claim1": <claim response object>,
-      "claim2": <claim response object>,
-      "claim3": <claim response object>
+      "claim1": "<claim response object>",
+      "claim2": "<claim response object>",
+      "claim3": "<claim response object>"
     }
+```
 
 Each claim response object takes the following form:
 
+```json
     {
       "verified": true,
       "metadata": {
@@ -206,13 +212,15 @@ Each claim response object takes the following form:
         }
       }
     }
+```
 
 The "verified" property is only present if the validation_response code is 200.
 Otherwise, the validation_response contains error information.
 
 An example claim response (including both validation states and both error responses):
 
-    {
+```json
+	{
       "claim_id1": {
         "verified": true,
         "metadata": {
@@ -248,3 +256,12 @@ An example claim response (including both validation states and both error respo
         }
       }
     }
+```
+
+## Appendix
+
+### Related Packages
+* **![Claims Adjudicator Module (CAM)](https://github.com/byu-oit/ts-claims-engine)**
+* **![Claims Adjudicator Middleware](https://github.com/byu-oit/ts-claims-engine-middleware)**
+* **![Claims Adjudicator Client](https://github.com/byu-oit/ts-claims-engine-client)**
+* **![Claims Adjudicator WSO2 Request](https://github.com/byu-oit/ts-wso2-claims-request)**
