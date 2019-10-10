@@ -1,5 +1,5 @@
-import {ClaimsAdjudicator} from "@byu-oit/ts-claims-engine";
-import {middleware} from "../src";
+import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
+import {middleware, api} from '../src';
 import {
     generateMetadataResponseObj,
     generateValidationResponseObj,

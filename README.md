@@ -150,7 +150,7 @@ Each claim object takes the following form:
           "concept": "age",
           "relationship": "gt_or_eq",
           "value": "21",
-          "qualifier": { ageOffset: -5 }
+          "qualifier": { "ageOffset": -5 }
         }
       ]
     }
