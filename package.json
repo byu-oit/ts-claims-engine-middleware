@@ -46,6 +46,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.12",
     "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "coveralls": "^3.0.6",
     "lodash": "^4.17.15",
     "mocha": "^6.2.0",

@@ -1,32 +1,124 @@
 import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
-import * as CAM from '../src';
+import {Request, Response} from 'express';
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+
 import claimsController, {Controller} from '../src/controllers/claims'
 import {generateMetadataResponseObj, generateValidationResponseObj, isObjEmpty} from '../src/controllers/util';
-import {Request, Response} from 'express';
-import {assert} from 'chai';
 import {testClaims, testConcepts} from './static';
+import * as server from './server';
 import _ = require('lodash');
 
+chai.use(chaiHttp);
+
 describe('Claims Adjudicator Middleware', () => {
-    let engine: ClaimsAdjudicator;
-    let controllers: Controller;
+    describe('Server Integration', () => {
+        let request: ChaiHttp.Agent;
 
-    const res: any = {status: (code: number) => ({send: (res: any) => res})};
+        before(() => {
+            server.start();
+            request = chai.request('http://localhost:8080')
+        });
 
-    beforeEach(() => {
-        const goodConcepts = _.omit(testConcepts, ['bad_cast_favorite_color', 'bad_compare_favorite_color']);
-        engine = new ClaimsAdjudicator(goodConcepts);
-        controllers = claimsController(engine);
-    });
+        after(() => {
+            server.stop();
+        });
 
-    describe('Middleware', () => {
-        it('will instantiate the enforcer middleware', async () => {
-            const middleware = await CAM.middleware(engine);
-            assert.isFunction(middleware);
+        it('will request the getConcepts endpoint on the server', async () => {
+            const expected = {
+                "metadata": {
+                    "validation_response": {
+                        "code": 200,
+                        "message": "Success"
+                    }
+                },
+                "values": [
+                    {
+                        "id": "subject_exists",
+                        "description": "The subject exists",
+                        "longDescription": "Determines whether a subject is a known entity within the domain.",
+                        "type": "boolean",
+                        "relationships": [
+                            "eq",
+                            "not_eq"
+                        ],
+                        "qualifiers": [
+                            "age"
+                        ]
+                    },
+                    {
+                        "id": "age",
+                        "description": "The subject is of age",
+                        "longDescription": "Determine if the subject is of an age",
+                        "type": "int",
+                        "relationships": [
+                            "gt",
+                            "gt_or_eq",
+                            "lt",
+                            "lt_or_eq",
+                            "eq",
+                            "not_eq"
+                        ],
+                        "qualifiers": []
+                    },
+                    {
+                        "id": "subjectExists",
+                        "description": "The subject exists",
+                        "longDescription": "Determines whether a subject is a known entity within the domain.",
+                        "type": "boolean",
+                        "relationships": [
+                            "eq",
+                            "not_eq"
+                        ],
+                        "qualifiers": [
+                            "age"
+                        ]
+                    }
+                ]
+            };
+            const actual = await request.get('/claims').send();
+            chai.assert.deepEqual(actual.body, expected)
+        });
+        it('will request the verifyClaims endpoint on the server', async () => {
+            const expected = {
+                "1": {
+                    "verified": true,
+                    "metadata": {
+                        "validation_response": {
+                            "code": 200,
+                            "message": "Success"
+                        }
+                    }
+                }
+            };
+            const actual = await request.put('/claims').send({
+                '1': {
+                    'subject': '123456987',
+                    'claims': [
+                        {
+                            'concept': 'subject_exists',
+                            'relationship': 'eq',
+                            'value': 'true'
+                        }
+                    ]
+                }
+            });
+            chai.assert.deepEqual(actual.body, expected)
         });
     });
 
     describe('Controllers', () => {
+        let engine: ClaimsAdjudicator;
+        let controllers: Controller;
+
+        const res: any = {status: (code: number) => ({send: (res: any) => res})};
+
+        beforeEach(() => {
+            const goodConcepts = _.omit(testConcepts, ['bad_cast_favorite_color', 'bad_compare_favorite_color']);
+            engine = new ClaimsAdjudicator(goodConcepts);
+            controllers = claimsController(engine);
+        });
+
         it('will retrieve a collection of properties against which claims can be made', async () => {
             const expected = {
                 "metadata": {
@@ -132,7 +224,7 @@ describe('Claims Adjudicator Middleware', () => {
                 ]
             };
             const actual = await controllers.claims.getConcepts({} as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return a collection of claim validation responses', async () => {
@@ -222,7 +314,7 @@ describe('Claims Adjudicator Middleware', () => {
                 }
             };
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected)
+            chai.assert.deepEqual(actual, expected)
         });
 
         it('will return an empty response', async () => {
@@ -231,7 +323,7 @@ describe('Claims Adjudicator Middleware', () => {
             };
             const expected = {};
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return an empty response', async () => {
@@ -240,7 +332,7 @@ describe('Claims Adjudicator Middleware', () => {
             };
             const expected = {};
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return true claim verification responses', async () => {
@@ -323,7 +415,7 @@ describe('Claims Adjudicator Middleware', () => {
                 }
             };
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return false claim verification responses', async () => {
@@ -406,7 +498,7 @@ describe('Claims Adjudicator Middleware', () => {
                 }
             };
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return bad request error claim verification responses', async () => {
@@ -489,7 +581,7 @@ describe('Claims Adjudicator Middleware', () => {
                 }
             };
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
 
         it('will return internal error claim verification responses', async () => {
@@ -521,7 +613,7 @@ describe('Claims Adjudicator Middleware', () => {
                 }
             };
             const actual = await controllers.claims.validateClaims(req as Request, res as Response);
-            assert.deepEqual(actual, expected);
+            chai.assert.deepEqual(actual, expected);
         });
     });
 
@@ -536,7 +628,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return success', () => {
@@ -549,7 +641,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return success', () => {
@@ -562,7 +654,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return success', () => {
@@ -575,7 +667,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return success', () => {
@@ -590,7 +682,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return success', () => {
@@ -603,7 +695,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return created', () => {
@@ -616,7 +708,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return created', () => {
@@ -629,7 +721,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return bad request', () => {
@@ -642,7 +734,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return unauthorized', () => {
@@ -655,7 +747,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return forbidden', () => {
@@ -668,7 +760,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return not found', () => {
@@ -681,7 +773,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return conflict', () => {
@@ -694,7 +786,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
 
         it('will return internal server error', () => {
@@ -707,7 +799,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
     });
 
@@ -720,29 +812,29 @@ describe('Claims Adjudicator Middleware', () => {
                     "message": "Internal Server Error"
                 }
             };
-            assert.deepEqual(actual, expect);
+            chai.assert.deepEqual(actual, expect);
         });
     });
 
     describe('Is Empty Object', () => {
         it('will return true when input is null', () => {
             const actual = isObjEmpty(null);
-            assert.isTrue(actual);
+            chai.assert.isTrue(actual);
         });
 
         it('will return true when input is not an object', () => {
             const actual = isObjEmpty('not an object');
-            assert.isTrue(actual);
+            chai.assert.isTrue(actual);
         });
 
         it('will return true when the object has no properties', () => {
             const actual = isObjEmpty({});
-            assert.isTrue(actual);
+            chai.assert.isTrue(actual);
         });
 
         it('will return false when the object has at least one property', () => {
             const actual = isObjEmpty({greet: 'hello'});
-            assert.isFalse(actual);
+            chai.assert.isFalse(actual);
         });
     })
 });
