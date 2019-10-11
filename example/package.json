@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@byu-oit/ts-claims-engine-middleware": "^0.1.1"
+    "@byu-oit/ts-claims-engine-middleware": "^1.0.0"
   }
 }

@@ -1,5 +1,5 @@
 const express = require('express')
-const CAM = require('../dist')
+const CAM = require('@byu-oit/ts-claims-engine-middleware')
 const adjudicator = require('./adjudicator')
 
 ;(async function () {
