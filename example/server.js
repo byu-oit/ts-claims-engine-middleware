@@ -5,7 +5,7 @@ const adjudicator = require('./adjudicator')
 ;(async function () {
   const app = express()
 
-  // Body parser to handle POST body
+  // REQUIRED: Body parser to handle POST body
   app.use(express.json())
 
   // Log requests as they come in
@@ -14,10 +14,11 @@ const adjudicator = require('./adjudicator')
     return next()
   })
 
-// Handle claims
+  // Implement claims middleware
   const handleClaims = await CAM.middleware(adjudicator)
   app.use('/claims', handleClaims)
 
+  // Start server
   const port = process.env.PORT || 8080
   app.listen(port, () => {
     console.log(`Server running on port: ${port}`)

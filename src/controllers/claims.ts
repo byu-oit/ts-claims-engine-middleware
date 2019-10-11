@@ -14,19 +14,19 @@ export interface Operations {
 }
 
 export interface Controller {
-    [key: string]: Operations
+    [key: string]: Operations;
 }
 
-export default function (adjudicator: ClaimsAdjudicator): Controller {
+export default function(adjudicator: ClaimsAdjudicator): Controller {
     const controller: Operations = {};
 
-    controller.getConcepts = async function (req: Request, res: Response) {
+    controller.getConcepts = async (req: Request, res: Response) => {
         const metadata = generateValidationResponseObj(200);
         const values = adjudicator.getConcepts();
         return res.status(200).send({metadata, values});
     };
 
-    controller.validateClaims = async function (req: Request, res: Response) {
+    controller.validateClaims = async (req: Request, res: Response) => {
         let verified: ClaimsResponse;
         try {
             verified = await adjudicator.verifyClaims(req.body);
@@ -49,4 +49,4 @@ export default function (adjudicator: ClaimsAdjudicator): Controller {
     };
 
     return {claims: controller};
-};
+}
