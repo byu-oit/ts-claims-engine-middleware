@@ -16,7 +16,8 @@ The Claims Adjudicator Middleware is an _![express](https://expressjs.com)_ midd
 // adjudicator.js
 const {ClaimsAdjudicator, Concept} = require('@byu-oit/ts-claims-engine')
 
-const subjects = {...} // Static value for demonstrative purposes
+// Static subjects for demonstrative purposes.
+const subjects = {...}
 
 const concepts = { // Create concepts
     subject_exists: new Concept({
@@ -50,16 +51,31 @@ module.exports = new ClaimsAdjudicator(concepts) // Export adjudicator instance
 ```js
 // app.js
 const express = require('express')
-const {middleware} = require('@byu-oit/ts-claims-engine-middleware')
+const CAM = require('@byu-oit/ts-claims-engine-middleware')
 const adjudicator = require('./adjudicator')
 
-const app = express()
-app.use(middleware(adjudicator))
+;(async function () {
+  const app = express()
 
-const port = process.env.PORT || 8080
-app.listen(port, () => {
+  // REQUIRED: Body parser to handle POST body
+  app.use(express.json())
+
+  // Log requests as they come in
+  app.use((req, res, next) => {
+    console.log(req.method + ' ' + req.path)
+    return next()
+  })
+
+  // Implement claims middleware
+  const handleClaims = await CAM.middleware(adjudicator)
+  app.use('/claims', handleClaims)
+
+  // Start server
+  const port = process.env.PORT || 8080
+  app.listen(port, () => {
     console.log(`Server running on port: ${port}`)
-})
+  })
+})()
 ```
 
 
