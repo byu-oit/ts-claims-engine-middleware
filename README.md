@@ -14,7 +14,7 @@ The Claims Adjudicator Middleware is an _![express](https://expressjs.com)_ midd
 ### 1. Define CAM
 ```js
 // adjudicator.js
-const {ClaimsAdjudicator} = require('@byu-oit/ts-claims-engine')
+const {ClaimsAdjudicator, Concept} = require('@byu-oit/ts-claims-engine')
 
 const subjects = {...} // Static value for demonstrative purposes
 
@@ -42,7 +42,7 @@ const concepts = { // Create concepts
     })
 }
 
-export default new ClaimsAdjudicator(concepts) // Export adjudicator instance
+module.exports = new ClaimsAdjudicator(concepts) // Export adjudicator instance
 ```
 
 

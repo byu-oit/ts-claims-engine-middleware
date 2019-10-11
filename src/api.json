@@ -19,6 +19,7 @@
   ],
   "paths": {
     "/": {
+      "x-controller": "claims",
       "get": {
         "summary": "Retrieve Properties",
         "description": "Retrieves a collection of properties against which claims can be made.",

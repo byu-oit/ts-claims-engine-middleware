@@ -1,35 +1,28 @@
 import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
-import {middleware, api} from '../src';
-import {
-    generateMetadataResponseObj,
-    generateValidationResponseObj,
-    getControllers,
-    isObjEmpty
-} from '../src/controllers';
-import {NextFunction, Request, Response} from 'express';
+import * as CAM from '../src';
+import claimsController, {Controller} from '../src/controllers/claims'
+import {generateMetadataResponseObj, generateValidationResponseObj, isObjEmpty} from '../src/controllers/util';
+import {Request, Response} from 'express';
 import {assert} from 'chai';
 import {testClaims, testConcepts} from './static';
 import _ = require('lodash');
 
 describe('Claims Adjudicator Middleware', () => {
     let engine: ClaimsAdjudicator;
-    let controllers: {
-        getConcepts: (req: Request, res: Response, next?: NextFunction) => Promise<any>;
-        validateClaims: (req: Request, res: Response, next?: NextFunction) => Promise<any>;
-    };
+    let controllers: Controller;
 
     const res: any = {status: (code: number) => ({send: (res: any) => res})};
 
     beforeEach(() => {
         const goodConcepts = _.omit(testConcepts, ['bad_cast_favorite_color', 'bad_compare_favorite_color']);
         engine = new ClaimsAdjudicator(goodConcepts);
-        controllers = getControllers(engine);
+        controllers = claimsController(engine);
     });
 
     describe('Middleware', () => {
         it('will instantiate the enforcer middleware', async () => {
-            const CAM = await middleware(engine);
-            assert.isFunction(CAM);
+            const middleware = await CAM.middleware(engine);
+            assert.isFunction(middleware);
         });
     });
 
@@ -138,7 +131,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 ]
             };
-            const actual = await controllers.getConcepts({} as Request, res as Response);
+            const actual = await controllers.claims.getConcepts({} as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
@@ -228,7 +221,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected)
         });
 
@@ -237,7 +230,7 @@ describe('Claims Adjudicator Middleware', () => {
                 body: {}
             };
             const expected = {};
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
@@ -246,7 +239,7 @@ describe('Claims Adjudicator Middleware', () => {
                 body: 'Bad Request'
             };
             const expected = {};
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
@@ -329,7 +322,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
@@ -412,7 +405,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
@@ -495,14 +488,14 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
 
         it('will return internal error claim verification responses', async () => {
             const concepts = _.pick(testConcepts, ['subject_exists', 'bad_cast_favorite_color', 'bad_compare_favorite_color']);
             engine = new ClaimsAdjudicator(concepts);
-            controllers = getControllers(engine);
+            controllers = claimsController(engine);
 
             const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('e_internal')));
             const req = {
@@ -527,7 +520,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await controllers.validateClaims(req as Request, res as Response);
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
             assert.deepEqual(actual, expected);
         });
     });
@@ -737,7 +730,7 @@ describe('Claims Adjudicator Middleware', () => {
             assert.isTrue(actual);
         });
 
-        it ('will return true when input is not an object', () => {
+        it('will return true when input is not an object', () => {
             const actual = isObjEmpty('not an object');
             assert.isTrue(actual);
         });
@@ -748,7 +741,7 @@ describe('Claims Adjudicator Middleware', () => {
         });
 
         it('will return false when the object has at least one property', () => {
-            const actual = isObjEmpty({ greet: 'hello' });
+            const actual = isObjEmpty({greet: 'hello'});
             assert.isFalse(actual);
         });
     })

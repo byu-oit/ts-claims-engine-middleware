@@ -1,13 +1,10 @@
+import * as path from 'path';
 import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
-import Enforcer = require('openapi-enforcer-middleware');
-import * as api from './api.json';
-import {getControllers} from './controllers';
-
-export {api};
+import Enforcer from 'openapi-enforcer-middleware';
+import controllers from './controllers/claims'
 
 export async function middleware(adjudicator: ClaimsAdjudicator) {
-    const controllers = getControllers(adjudicator);
-    const enforcer = new Enforcer(api);
-    await enforcer.controllers(controllers);
+    const enforcer = new Enforcer(path.resolve(__dirname, './api.json'));
+    await enforcer.controllers(controllers, adjudicator);
     return enforcer.middleware();
 }
