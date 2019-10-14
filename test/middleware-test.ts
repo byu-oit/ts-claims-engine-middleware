@@ -15,13 +15,13 @@ describe('Claims Adjudicator Middleware', () => {
     describe('Server Integration', () => {
         let request: ChaiHttp.Agent;
 
-        before(() => {
-            server.start();
+        before(async () => {
+            await server.start();
             request = chai.request('http://localhost:8080')
         });
 
-        after(() => {
-            server.stop();
+        after(async () => {
+            await server.stop();
         });
 
         it('will request the getConcepts endpoint on the server', async () => {
