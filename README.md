@@ -1,6 +1,6 @@
 <h1 align="center">Claims Engine Middleware</h1>
 
-<p align="center">An Express middleware function to facilitate the rapid use of the [Claims Adjudicator Module (CAM)](https://github.com/byu-oit/ts-claims-engine)</p>
+<p align="center">An Express middleware function to facilitate the rapid use of the <a href="https://github.com/byu-oit/ts-claims-engine">Claims Adjudicator Module (CAM)</a></p>
 
 <p align="center">
     <img alt="Build Status" src="https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master)](https://travis-ci.org/byu-oit/ts-claims-engine-middleware" />
