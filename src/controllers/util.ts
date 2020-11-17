@@ -23,10 +23,7 @@ export function getResponseForReturnCode(code: number) {
     if (code === 409) {
         return 'Conflict';
     }
-    if (code === 500) {
-        return 'Internal Server Error';
-    }
-    return '';
+    return 'Internal Server Error';
 }
 
 export function isObjEmpty(obj: any) {

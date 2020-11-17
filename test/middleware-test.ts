@@ -1,27 +1,22 @@
 import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
-import {Request, Response} from 'express';
+import {Request, Response, Application} from 'express';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 
 import claimsController, {Controller} from '../src/controllers/claims'
 import {generateMetadataResponseObj, generateValidationResponseObj, isObjEmpty} from '../src/controllers/util';
 import {testClaims, testConcepts} from './static';
-import * as server from './server';
+import createApp from './server';
 import _ = require('lodash');
 
 chai.use(chaiHttp);
 
 describe('Claims Adjudicator Middleware', () => {
     describe('Server Integration', () => {
-        let request: ChaiHttp.Agent;
+        let app: Application;
 
         before(async () => {
-            await server.start();
-            request = chai.request('http://localhost:8080')
-        });
-
-        after(async () => {
-            await server.stop();
+            app = await createApp()
         });
 
         it('will request the getConcepts endpoint on the server', async () => {
@@ -76,7 +71,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 ]
             };
-            const actual = await request.get('/claims').send();
+            const actual = await chai.request(app).get('/claims');
             chai.assert.deepEqual(actual.body, expected)
         });
         it('will request the verifyClaims endpoint on the server', async () => {
@@ -91,7 +86,7 @@ describe('Claims Adjudicator Middleware', () => {
                     }
                 }
             };
-            const actual = await request.put('/claims').send({
+            const actual = await chai.request(app).put('/claims').send({
                 '1': {
                     'subject': '123456987',
                     'claims': [
