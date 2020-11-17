@@ -1,9 +1,0 @@
-src/
-test/
-example/
-.idea/
-coverage/
-.nyc_output/
-tsconfig.json
-tslint.json
-.travis.yml

@@ -13,6 +13,9 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/byu-oit/ts-claims-engine-middleware.git"
