@@ -3,10 +3,10 @@
 <p align="center">An Express middleware function to facilitate the rapid use of the <a href="https://github.com/byu-oit/ts-claims-engine">Claims Adjudicator Module (CAM)</a></p>
 
 <p align="center">
-    <img alt="Build Status" src="https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master" />
-    <img alt="Coverage Status" src="https://coveralls.io/repos/github/byu-oit/ts-claims-engine-middleware/badge.svg?branch=master" />
+    <a href="https://travis-ci.org/byu-oit/ts-claims-engine-middleware"><img alt="Build Status" src="https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master" /></a>
+    <a href="https://coveralls.io/github/byu-oit/ts-claims-engine-middleware?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/byu-oit/ts-claims-engine-middleware/badge.svg?branch=master" /></a>
     <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/byu-oit/ts-claims-engine-middleware" />
-    <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier" />
+    <a href="https://prettier.io/"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier" /></a>
 </p>
 
 <br>
