@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npm run clean && tsc && npm run copy",
-    "clean": "rm -rf ./dist",
+    "clean": "del-cli dist",
     "copy": "cp src/api.json dist/",
     "coverage": "nyc report --reporter=json",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -20,7 +20,7 @@
     "type": "git",
     "url": "git+https://github.com/byu-oit/ts-claims-engine-middleware.git"
   },
-  "author": "Spencer Tuft <spencer_tuft@byu.edu>",
+  "author": "Spencer Tuft <stuft2@byu.edu>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/byu-oit/ts-claims-engine-middleware/issues"
@@ -36,6 +36,7 @@
     "@typescript-eslint/parser": "^4.8.1",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "del-cli": "^3.0.1",
     "eslint": "^7.13.0",
     "eslint-config-prettier": "^6.15.0",
     "husky": "^4.3.0",
