@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "esModuleInterop": true,
     "sourceMap": true,
     "allowJs": false,
@@ -10,11 +10,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "strictNullChecks": true,
-    "moduleResolution": "node",
-    "lib": [
-      "es7",
-      "es2017.object"
-    ],
+    "moduleResolution": "Node",
     "outDir": "dist"
   },
   "include": [

@@ -1,12 +1,12 @@
-import express from 'express';
-import * as CAM from '../src';
+import express, {Application} from 'express'
+import * as CAM from '../src'
 import adjudicator from './adjudicator'
 
-export default async function () {
+export default async function (): Promise<Application> {
     const app = express()
-    app.use(express.json());
+    app.use(express.json())
 
-    const handleClaims = await CAM.middleware(adjudicator);
-    app.use('/claims', handleClaims);
+    const handleClaims = await CAM.middleware(adjudicator)
+    app.use('/claims', handleClaims)
     return app
 }

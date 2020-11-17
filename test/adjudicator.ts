@@ -1,4 +1,4 @@
-import {ClaimsAdjudicator, Concept} from "@byu-oit/ts-claims-engine";
+import {ClaimsAdjudicator, Concept} from "@byu-oit/ts-claims-engine"
 
 interface MySubjects {
     [key: string]: {
@@ -28,7 +28,7 @@ const subjects: MySubjects = {
         height: 5.8,
         favorite_color: 'red'
     }
-};
+}
 
 const concepts = { // Create concepts
     subject_exists: new Concept({
@@ -52,6 +52,6 @@ const concepts = { // Create concepts
         relationships: ['gt', 'gt_or_eq', 'lt', 'lt_or_eq', 'eq', 'not_eq'],
         getValue: async (id) => subjects[id].age
     })
-};
+}
 
-export default new ClaimsAdjudicator(concepts); // Export adjudicator instance
+export default new ClaimsAdjudicator(concepts) // Export adjudicator instance

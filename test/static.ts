@@ -1,29 +1,29 @@
-import {Concept} from '@byu-oit/ts-claims-engine';
+import {Concept} from '@byu-oit/ts-claims-engine'
 
 class Food {
-    public name: string;
+    public name: string
 
     constructor(name: string) {
-        this.name = name;
+        this.name = name
     }
 }
 
 class Sex {
-    public value: string;
+    public value: string
 
     constructor(value: 'm' | 'f') {
-        this.value = value;
+        this.value = value
     }
 }
 
 export const subjects: {
     [key: string]: {
-        age: number;
-        birth_date: string;
-        height: number;
-        favorite_color: string;
-        favorite_food: Food;
-        sex: Sex;
+        age: number
+        birth_date: string
+        height: number
+        favorite_color: string
+        favorite_food: Food
+        sex: Sex
     }
 } = {
     '123456789': {
@@ -50,7 +50,7 @@ export const subjects: {
         favorite_food: new Food('ice cream'),
         sex: new Sex('f')
     }
-};
+}
 
 export const testConcepts = {
     subject_exists: new Concept({
@@ -88,30 +88,31 @@ export const testConcepts = {
         relationships: ['gt', 'gt_or_eq', 'lt', 'lt_or_eq', 'eq', 'not_eq'],
         getValue: async (id: string) => subjects[id].favorite_color,
         compare: (a, b) => {
-            const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
-            return colors.indexOf(b) - colors.indexOf(a);
+            const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
+            return colors.indexOf(b) - colors.indexOf(a)
         },
     }),
-    favorite_food: new Concept({
+    favorite_food: new Concept<Food>({
         description: 'The subject has the favorite food',
         longDescription: 'The subject considers their favorite food to be',
         type: 'food', // Some Generic Type
         relationships: ['eq', 'not_eq'],
         getValue: async (id: string) => subjects[id].favorite_food,
-        compare: (a: Food, b: Food) => {
-            const colors = ['pizza', 'ice cream', 'salad'];
-            return colors.indexOf(b.name) - colors.indexOf(a.name);
+        compare: (a, b) => {
+            const colors = ['pizza', 'ice cream', 'salad']
+            return colors.indexOf(b.name) - colors.indexOf(a.name)
         },
         cast: value => new Food(value)
     }),
-    sex: new Concept({
+    sex: new Concept<Sex>({
         description: 'The subject is of the sex',
         longDescription: 'The subject is biologically considered',
         type: 'sex', // Some Generic Type
         relationships: ['eq', 'not_eq'],
         getValue: async (id: string) => subjects[id].sex,
-        compare: (a: Sex, b: Sex) => {
-            return 0;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        compare: (a, b) => {
+            return 0
         },
     }),
     bad_compare_favorite_color: new Concept({
@@ -120,8 +121,9 @@ export const testConcepts = {
         type: 'string',
         relationships: ['eq', 'not_eq'],
         getValue: async (id: string) => subjects[id].favorite_color,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         compare: (a, b) => {
-            throw new Error('Fake Error');
+            throw new Error('Fake Error')
         },
     }),
     bad_cast_favorite_color: new Concept({
@@ -130,11 +132,12 @@ export const testConcepts = {
         type: 'color',
         relationships: ['eq', 'not_eq'],
         getValue: async (id: string) => subjects[id].favorite_color,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         cast: (value) => {
-            throw new Error('Fake Error');
+            throw new Error('Fake Error')
         },
     })
-};
+}
 
 export const testClaims = {
     t1: {
@@ -412,4 +415,4 @@ export const testClaims = {
             }
         ]
     }
-};
+}
