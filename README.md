@@ -3,6 +3,12 @@
 <p align="center">An Express middleware function to facilitate the rapid use of the <a href="https://github.com/byu-oit/ts-claims-engine">Claims Adjudicator Module (CAM)</a></p>
 
 <p align="center">
+    <a href="https://github.com/byu-oit/ts-claims-engine-middleware/actions?query=workflow%3ACI">
+      <img alt="CI" src="https://github.com/byu-oit/ts-claims-engine-middleware/workflows/CI/badge.svg" />
+    </a>
+    <a href="https://codecov.io/gh/byu-oit/ts-claims-engine-middleware">
+      <img src="https://codecov.io/gh/byu-oit/ts-claims-engine-middleware/branch/master/graph/badge.svg" />
+    </a>
     <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/byu-oit/ts-claims-engine-middleware" />
     <a href="https://prettier.io/"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier" /></a>
 </p>
