@@ -18,27 +18,31 @@
 ## Installation
 `npm i @byu-oit/ts-claims-engine-middleware`
 
+<br>
+
 ## Introduction
 The Claims Adjudicator Middleware is an _[express](https://expressjs.com)_ middleware function. It's purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
 
-## Example
+<br>
+
+## Usage & Examples
 
 ### 1. Define CAM
 ```js
-// adjudicator.js
-const {ClaimsAdjudicator, Concept} = require('@byu-oit/ts-claims-engine')
+// example/adjudicator.js
+const {ClaimsAdjudicator, Concept, Relationships} = require('@byu-oit/ts-claims-engine')
 
 // Static subjects for demonstrative purposes.
 const subjects = {...}
 
-const concepts = { // Create concepts
-    subject_exists: new Concept({
+const concepts = [ // Create concepts
+    Concept.Boolean({
+        name: 'subject_exists',
         description: 'The subject exists',
         longDescription: 'Determines whether a subject is a known entity within the domain.',
-        type: 'boolean',
-        relationships: ['eq', 'not_eq'],
+        relationships: [Relationships.EQ, Relationships.NE],
         qualifiers: ['age'],
-        getValue: async (id, qualifiers) => {
+        async getValue (id, qualifiers) {
             if (qualifiers && qualifiers.age) {
                 return subjects[id] !== undefined && subjects[id].age === qualifiers.age
             } else {
@@ -46,24 +50,26 @@ const concepts = { // Create concepts
             }
         }
     }),
-    age: new Concept({
+    Concept.Number({
+        name: 'age',
         description: 'The subject is of age',
         longDescription: 'Determine if the subject is of an age',
-        type: 'int',
-        relationships: ['gt', 'gt_or_eq', 'lt', 'lt_or_eq', 'eq', 'not_eq'],
-        getValue: async (id) => subjects[id].age
+        relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
+        async getValue (id) {
+            return subjects[id].age
+        }
     })
-}
+]
 
 module.exports = new ClaimsAdjudicator(concepts) // Export adjudicator instance
 ```
 
 
-### 2. Define server with adjudicator middleware
+### 2. Define the server with adjudicator middleware
 ```js
-// app.js
+// example/server.js
 const express = require('express')
-const CAM = require('@byu-oit/ts-claims-engine-middleware')
+const { middleware, EnforcerError } = require('@byu-oit/ts-claims-engine-middleware')
 const adjudicator = require('./adjudicator')
 
 ;(async function () {
@@ -79,8 +85,12 @@ const adjudicator = require('./adjudicator')
   })
 
   // Implement claims middleware
-  const handleClaims = await CAM.middleware(adjudicator)
+  const handleClaims = await middleware(adjudicator)
   app.use('/claims', handleClaims)
+
+  // Using the enforcer error middleware catches errors made related to the request format
+  // If an error occurs that is not related to formatting, a 500 error response will be returned
+  app.use(EnforcerError)
 
   // Start server
   const port = process.env.PORT || 8080
@@ -89,7 +99,7 @@ const adjudicator = require('./adjudicator')
   })
 })()
 ```
-
+<br>
 
 ## API
 
@@ -117,12 +127,20 @@ Each property on the object is a verification response object what has two prope
 ```
 
 The metadata property will always be present and must be inspected to determine whether
-an error occurred. If the validation_response code is 200, then the verified property
+an error occurred.
+
+If the validation_response code is 200, then the verified property
 will also be present and its boolean value is the state of the claim.
+
+If the validation_response code is not 200, then the response will be a single metadata
+object.
 
 The CAM returns two errors:
 
-* **400** Bad Request - The claim could not be evaluated because of an error in the claim declaration (e.g., an unrecognized concept or relationship).
+* **400** Bad Request - The claim could not be evaluated because of an error in the 
+claim declaration (e.g., an unrecognized concept or relationship). This error response
+will include another property in the metadata object `validation_information` which
+gives additional information about what went wrong.
 * **404** Not Found - The subject ID could not be resolved to a resource.
 
 ### Endpoints
@@ -272,7 +290,10 @@ An example claim response (including both validation states and both error respo
           "validation_response": {
             "code": 400,
             "message": "Bad Request"
-          }
+          },
+          "validation_information": [
+            "Relationship gt_or_eq is not defined for concept favorite_food"
+          ]
         }
       },
       "claim_id4": {
