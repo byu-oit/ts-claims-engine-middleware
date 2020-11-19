@@ -24,7 +24,7 @@ export default function(adjudicator: ClaimsAdjudicator): Controller {
 
     controller.validateClaims = async (req: Request, res: Response) => {
         const verified: ClaimsResponse = await adjudicator.verifyClaims(req.body)
-        const results = Object.entries(verified).reduce((acc, [key, result], i, arr) => {
+        const results = Object.entries(verified).reduce((acc, [key, result]) => {
             if (result instanceof SubjectNotFound) {
                 return Object.assign(acc, {[key]: generateMetadataResponseObj(404)})
             } else if (result instanceof ValidationError) {

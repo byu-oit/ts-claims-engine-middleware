@@ -65,7 +65,7 @@ export const testConcepts = [
         longDescription: 'Determines whether a subject is a known entity within the domain.',
         relationships: [Relationships.EQ, Relationships.NE],
         qualifiers: ['age'],
-        getValue: async (id: string, qualifiers) => {
+        async getValue (id: string, qualifiers) {
             if (qualifiers && qualifiers.age) {
                 return subjects[id] !== undefined && subjects[id].age === qualifiers.age
             } else {
@@ -78,22 +78,28 @@ export const testConcepts = [
         description: 'The subject is of age',
         longDescription: 'Determine if the subject is of an age',
         relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].age
+        async getValue (id: string) {
+            return subjects[id].age
+        }
     }),
     Concept.Number({
         name: 'height',
         description: 'The height of the subject',
         longDescription: 'The measured height of the subject in feet',
         relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].height
+        async getValue (id: string) {
+            return subjects[id].height
+        }
     }),
     Concept.String({
         name: 'favorite_color',
         description: 'The subject has the favorite color',
         longDescription: 'The subject considers their favorite color to be',
         relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].favorite_color,
-        compare: (a, b) => {
+        async getValue (id: string) {
+            return subjects[id].favorite_color
+        },
+        compare (a, b) {
             const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
             return colors.indexOf(b) - colors.indexOf(a)
         }
@@ -103,27 +109,35 @@ export const testConcepts = [
         description: 'The subject has the name',
         longDescription: 'The subjects has the name',
         relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].name
+        async getValue (id: string) {
+            return subjects[id].name
+        }
     }),
     Concept.Custom<Food>({
         name: 'favorite_food',
         description: 'The subject has the favorite food',
         longDescription: 'The subject considers their favorite food to be',
         relationships: [Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].favorite_food,
-        compare: (a, b) => {
+        async getValue (id: string) {
+            return subjects[id].favorite_food
+        },
+        compare (a, b) {
             const colors = ['pizza', 'ice cream', 'salad']
             return colors.indexOf(b.name) - colors.indexOf(a.name)
         },
-        cast: value => new Food(value)
+        cast (value) {
+            return new Food(value)
+        }
     }),
     Concept.Custom<Sex>({
         name: 'sex',
         description: 'The subject is of the sex',
         longDescription: 'The subject is biologically considered',
         relationships: [Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].sex,
-        compare: (a, b) => {
+        async getValue (id: string) {
+            return subjects[id].sex
+        },
+        compare () {
             return 0
         },
         cast (value) {
@@ -143,7 +157,9 @@ export const testConcepts = [
         description: 'The subject has the favorite color',
         longDescription: 'The subject considers their favorite color to be',
         relationships: [Relationships.EQ, Relationships.NE],
-        getValue: async (id: string) => subjects[id].favorite_color,
+        async getValue (id: string) {
+            return subjects[id].favorite_color
+        },
         cast () { throw new Error('Fake Error') }
     })
 ]

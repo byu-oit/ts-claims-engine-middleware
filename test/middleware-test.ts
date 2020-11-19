@@ -8,10 +8,14 @@ import {generateMetadataResponseObj, generateValidationResponseObj} from '../src
 import {testClaims, testConcepts} from './static'
 import createApp from './server'
 import _ = require('lodash')
+import {EnforcerError} from "../src";
 
 chai.use(chaiHttp)
 
 describe('Claims Adjudicator Middleware', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const res = {status: (code: number) => ({send: (res: unknown) => res})}
+
     describe('Server Integration', () => {
         let app: Application
 
@@ -92,14 +96,16 @@ describe('Claims Adjudicator Middleware', () => {
             chai.assert.equal(result.status, 400)
             chai.assert.isTrue(result.clientError)
         })
+        it('will fail with a 500 response for an error thrown in the OpenAPI Enforcer', async () => {
+            const err = new Error('Fake Error')
+            const result = EnforcerError(err, {} as Request, res as Response, () => { chai.assert.isTrue(false) })
+            chai.assert.equal(result.metadata.validation_response.code, 500)
+        })
     })
 
     describe('Controllers', () => {
         let engine: ClaimsAdjudicator
         let controllers: Controller
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const res = {status: (code: number) => ({send: (res: unknown) => res})}
 
         beforeEach(() => {
             const goodConcepts = testConcepts.filter(concept => !['bad_cast_favorite_color', 'bad_compare_favorite_color'].includes(concept.name))

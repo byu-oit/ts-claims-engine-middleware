@@ -7,8 +7,8 @@ import controllers from './controllers/claims'
 
 
 // TODO - Add better type definitions when openapi enforcer adds them
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function EnforcerError (err: Error & { exception: any }, req: Request, res: Response, next: NextFunction): any {
+// eslint-disable-next-line
+export function EnforcerError (err: Error & { exception?: any }, req: Request, res: Response, next: NextFunction): any {
     const title = 'Request has one or more errors'
     if (err && err.exception && err.exception.header === title) {
         const validationErrors = err.message.replace(title + '\n ', '').split('\n ')
