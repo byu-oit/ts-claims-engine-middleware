@@ -1,6 +1,6 @@
 import {
     ClaimsAdjudicator,
-    ClaimsResponse
+    ClaimsResponse, SubjectNotFound, ValidationError
 } from '@byu-oit/ts-claims-engine'
 import {NextFunction, Request, Response} from 'express'
 import {generateMetadataResponseObj, generateValidationResponseObj} from './util'
@@ -23,18 +23,13 @@ export default function(adjudicator: ClaimsAdjudicator): Controller {
     }
 
     controller.validateClaims = async (req: Request, res: Response) => {
-        let verified: ClaimsResponse
-        try {
-            verified = await adjudicator.verifyClaims(req.body)
-        } catch (e) {
-            return res.status(400).send({})
-        }
-        const results = Object.entries(verified).reduce((acc, [key, result]) => {
-            if (result.constructor.name === 'UnidentifiedSubjectError') {
+        const verified: ClaimsResponse = await adjudicator.verifyClaims(req.body)
+        const results = Object.entries(verified).reduce((acc, [key, result], i, arr) => {
+            if (result instanceof SubjectNotFound) {
                 return Object.assign(acc, {[key]: generateMetadataResponseObj(404)})
-            } else if (['ValidationError', 'BadRequest'].includes(result.constructor.name)) {
-                return Object.assign(acc, {[key]: generateMetadataResponseObj(400)})
-            } else if (result.constructor.name === 'InternalError') {
+            } else if (result instanceof ValidationError) {
+                return Object.assign(acc, {[key]: generateMetadataResponseObj(400, null, ...result.errors)})
+            } else if (result instanceof Error) {
                 return Object.assign(acc, {[key]: generateMetadataResponseObj(500)})
             } else {
                 const metadata = generateValidationResponseObj(200)

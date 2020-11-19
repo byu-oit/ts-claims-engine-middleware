@@ -1,5 +1,6 @@
 export interface Metadata {
     validation_response: ValidationResponse
+    validation_information?: string[]
 }
 export interface ValidationResponse {
     code: number
@@ -33,16 +34,19 @@ export function getResponseForReturnCode(code: number): string {
     return 'Internal Server Error'
 }
 
-export function generateValidationResponseObj(code: number, message?: null | string ): Metadata {
+export function generateValidationResponseObj(code: number, message?: null | string, ...errors: string[]): Metadata {
     if ([200, 201, 204, 400, 401, 403, 404, 409, 500].indexOf(code) === -1) {
         code = 500
     }
     if (message === undefined || message === null) {
         message = getResponseForReturnCode(code)
     }
-    return { validation_response: { code, message } }
+    return {
+        validation_response: { code, message },
+        ...errors.length && { validation_information: errors }
+    }
 }
 
-export function generateMetadataResponseObj(code: number, message?: null | string): { metadata: Metadata } {
-    return { metadata: generateValidationResponseObj(code, message) }
+export function generateMetadataResponseObj(code: number, message?: null | string, ...errors: string[]): { metadata: Metadata } {
+    return { metadata: generateValidationResponseObj(code, message, ...errors) }
 }
