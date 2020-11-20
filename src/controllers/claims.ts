@@ -1,6 +1,6 @@
 import {
     ClaimsAdjudicator,
-    ClaimsResponse, SubjectNotFound, ValidationError
+    ClaimsResponse, NotFound, ValidationError
 } from '@byu-oit/ts-claims-engine'
 import {NextFunction, Request, Response} from 'express'
 import {generateMetadataResponseObj, generateValidationResponseObj} from './util'
@@ -25,8 +25,8 @@ export default function(adjudicator: ClaimsAdjudicator): Controller {
     controller.validateClaims = async (req: Request, res: Response) => {
         const verified: ClaimsResponse = await adjudicator.verifyClaims(req.body)
         const results = Object.entries(verified).reduce((acc, [key, result]) => {
-            if (result instanceof SubjectNotFound) {
-                return Object.assign(acc, {[key]: generateMetadataResponseObj(404)})
+            if (result instanceof NotFound) {
+                return Object.assign(acc, {[key]: generateMetadataResponseObj(404, result.message)})
             } else if (result instanceof ValidationError) {
                 return Object.assign(acc, {[key]: generateMetadataResponseObj(400, null, ...result.errors)})
             } else if (result instanceof Error) {
