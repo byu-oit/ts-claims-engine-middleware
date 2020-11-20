@@ -1,4 +1,4 @@
-import {ClaimsAdjudicator, Modes, Relationships} from '@byu-oit/ts-claims-engine'
+import {ClaimsAdjudicator, Mode, Relationship} from '@byu-oit/ts-claims-engine'
 import {Request, Response, Application} from 'express'
 import chai from 'chai'
 import chaiHttp from 'chai-http'
@@ -37,8 +37,8 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject exists',
                         longDescription: 'Determines whether a subject is a known entity within the domain.',
                         relationships: [
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: [
                             'age'
@@ -49,12 +49,12 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject is of age',
                         longDescription: 'Determine if the subject is of an age',
                         relationships: [
-                            Relationships.GT,
-                            Relationships.GTE,
-                            Relationships.LT,
-                            Relationships.LTE,
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.GT,
+                            Relationship.GTE,
+                            Relationship.LT,
+                            Relationship.LTE,
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     }
@@ -81,7 +81,7 @@ describe('Claims Adjudicator Middleware', () => {
                     claims: [
                         {
                             concept: 'subject_exists',
-                            relationship: Relationships.EQ,
+                            relationship: Relationship.EQ,
                             value: 'true'
                         }
                     ]
@@ -127,8 +127,8 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject exists',
                         longDescription: 'Determines whether a subject is a known entity within the domain.',
                         relationships: [
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: [
                             'age'
@@ -139,12 +139,12 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject is of age',
                         longDescription: 'Determine if the subject is of an age',
                         relationships: [
-                            Relationships.GT,
-                            Relationships.GTE,
-                            Relationships.LT,
-                            Relationships.LTE,
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.GT,
+                            Relationship.GTE,
+                            Relationship.LT,
+                            Relationship.LTE,
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     },
@@ -153,12 +153,12 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The height of the subject',
                         longDescription: 'The measured height of the subject in feet',
                         relationships: [
-                            Relationships.GT,
-                            Relationships.GTE,
-                            Relationships.LT,
-                            Relationships.LTE,
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.GT,
+                            Relationship.GTE,
+                            Relationship.LT,
+                            Relationship.LTE,
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     },
@@ -167,12 +167,12 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject has the favorite color',
                         longDescription: 'The subject considers their favorite color to be',
                         relationships: [
-                            Relationships.GT,
-                            Relationships.GTE,
-                            Relationships.LT,
-                            Relationships.LTE,
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.GT,
+                            Relationship.GTE,
+                            Relationship.LT,
+                            Relationship.LTE,
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     },
@@ -181,12 +181,12 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject has the name',
                         longDescription: 'The subjects has the name',
                         relationships: [
-                            Relationships.GT,
-                            Relationships.GTE,
-                            Relationships.LT,
-                            Relationships.LTE,
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.GT,
+                            Relationship.GTE,
+                            Relationship.LT,
+                            Relationship.LTE,
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     },
@@ -195,8 +195,8 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject has the favorite food',
                         longDescription: 'The subject considers their favorite food to be',
                         relationships: [
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     },
@@ -205,8 +205,8 @@ describe('Claims Adjudicator Middleware', () => {
                         description: 'The subject is of the sex',
                         longDescription: 'The subject is biologically considered',
                         relationships: [
-                            Relationships.EQ,
-                            Relationships.NE
+                            Relationship.EQ,
+                            Relationship.NE
                         ],
                         qualifiers: []
                     }
@@ -224,7 +224,7 @@ describe('Claims Adjudicator Middleware', () => {
                         claims: [
                             {
                                 concept: 'subject_exists',
-                                relationship: Relationships.EQ,
+                                relationship: Relationship.EQ,
                                 value: 'true'
                             }
                         ]
@@ -234,18 +234,18 @@ describe('Claims Adjudicator Middleware', () => {
                         claims: [
                             {
                                 concept: 'subject_exists',
-                                relationship: Relationships.NE,
+                                relationship: Relationship.NE,
                                 value: 'true'
                             }
                         ]
                     },
                     3: {
                         subject: '123456987',
-                        mode: Modes.ANY,
+                        mode: Mode.ANY,
                         claims: [
                             {
                                 concept: 'subject_exists',
-                                relationship: Relationships.EQ,
+                                relationship: Relationship.EQ,
                                 qualifier: {
                                     age: 25
                                 },
@@ -258,7 +258,7 @@ describe('Claims Adjudicator Middleware', () => {
                         claims: [
                             {
                                 concept: 'subject_exists',
-                                relationship: Relationships.EQ,
+                                relationship: Relationship.EQ,
                                 value: 'true'
                             }
                         ]
@@ -297,7 +297,7 @@ describe('Claims Adjudicator Middleware', () => {
                     metadata: {
                         validation_response: {
                             code: 404,
-                            message: 'Not Found'
+                            message: 'Could not find subject 000000000'
                         }
                     }
                 }

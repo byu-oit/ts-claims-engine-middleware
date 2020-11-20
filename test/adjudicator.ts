@@ -1,4 +1,4 @@
-import {ClaimsAdjudicator, Concept, Relationships} from "@byu-oit/ts-claims-engine"
+import {ClaimsAdjudicator, Concept, Relationship} from "@byu-oit/ts-claims-engine"
 
 interface MySubjects {
     [key: string]: {
@@ -35,7 +35,7 @@ const concepts = [ // Create concepts
         name: 'subject_exists',
         description: 'The subject exists',
         longDescription: 'Determines whether a subject is a known entity within the domain.',
-        relationships: [Relationships.EQ, Relationships.NE],
+        relationships: [Relationship.EQ, Relationship.NE],
         qualifiers: ['age'],
         getValue: async (id, qualifiers) => {
             if (qualifiers && qualifiers.age) {
@@ -49,7 +49,7 @@ const concepts = [ // Create concepts
         name: 'age',
         description: 'The subject is of age',
         longDescription: 'Determine if the subject is of an age',
-        relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
+        relationships: [Relationship.GT, Relationship.GTE, Relationship.LT, Relationship.LTE, Relationship.EQ, Relationship.NE],
         getValue: async (id) => subjects[id].age
     })
 ]
