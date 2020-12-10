@@ -1,120 +1,32 @@
-import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine'
-import {Request, Response, Application} from 'express'
-import chai from 'chai'
-import chaiHttp from 'chai-http'
-
+import {ClaimsAdjudicator} from '@byu-oit/ts-claims-engine';
+import * as CAM from '../src';
 import claimsController, {Controller} from '../src/controllers/claims'
-import {generateMetadataResponseObj, generateValidationResponseObj} from '../src/controllers/util'
-import {testClaims, testConcepts} from './static'
-import createApp from './server'
-import _ = require('lodash')
-
-chai.use(chaiHttp)
+import {generateMetadataResponseObj, generateValidationResponseObj, isObjEmpty} from '../src/controllers/util';
+import {Request, Response} from 'express';
+import {assert} from 'chai';
+import {testClaims, testConcepts} from './static';
+import _ = require('lodash');
 
 describe('Claims Adjudicator Middleware', () => {
-    describe('Server Integration', () => {
-        let app: Application
+    let engine: ClaimsAdjudicator;
+    let controllers: Controller;
 
-        before(async () => {
-            app = await createApp()
-        })
+    const res: any = {status: (code: number) => ({send: (res: any) => res})};
 
-        it('will request the getConcepts endpoint on the server', async () => {
-            const expected = {
-                "metadata": {
-                    "validation_response": {
-                        "code": 200,
-                        "message": "Success"
-                    }
-                },
-                "values": [
-                    {
-                        "id": "subject_exists",
-                        "description": "The subject exists",
-                        "longDescription": "Determines whether a subject is a known entity within the domain.",
-                        "type": "boolean",
-                        "relationships": [
-                            "eq",
-                            "not_eq"
-                        ],
-                        "qualifiers": [
-                            "age"
-                        ]
-                    },
-                    {
-                        "id": "age",
-                        "description": "The subject is of age",
-                        "longDescription": "Determine if the subject is of an age",
-                        "type": "int",
-                        "relationships": [
-                            "gt",
-                            "gt_or_eq",
-                            "lt",
-                            "lt_or_eq",
-                            "eq",
-                            "not_eq"
-                        ],
-                        "qualifiers": []
-                    },
-                    {
-                        "id": "subjectExists",
-                        "description": "The subject exists",
-                        "longDescription": "Determines whether a subject is a known entity within the domain.",
-                        "type": "boolean",
-                        "relationships": [
-                            "eq",
-                            "not_eq"
-                        ],
-                        "qualifiers": [
-                            "age"
-                        ]
-                    }
-                ]
-            }
-            const actual = await chai.request(app).get('/claims')
-            chai.assert.deepEqual(actual.body, expected)
-        })
-        it('will request the verifyClaims endpoint on the server', async () => {
-            const expected = {
-                "1": {
-                    "verified": true,
-                    "metadata": {
-                        "validation_response": {
-                            "code": 200,
-                            "message": "Success"
-                        }
-                    }
-                }
-            }
-            const actual = await chai.request(app).put('/claims').send({
-                '1': {
-                    'subject': '123456987',
-                    'claims': [
-                        {
-                            'concept': 'subject_exists',
-                            'relationship': 'eq',
-                            'value': 'true'
-                        }
-                    ]
-                }
-            })
-            chai.assert.deepEqual(actual.body, expected)
-        })
-    })
+    beforeEach(() => {
+        const goodConcepts = _.omit(testConcepts, ['bad_cast_favorite_color', 'bad_compare_favorite_color']);
+        engine = new ClaimsAdjudicator(goodConcepts);
+        controllers = claimsController(engine);
+    });
+
+    describe('Middleware', () => {
+        it('will instantiate the enforcer middleware', async () => {
+            const middleware = await CAM.middleware(engine);
+            assert.isFunction(middleware);
+        });
+    });
 
     describe('Controllers', () => {
-        let engine: ClaimsAdjudicator
-        let controllers: Controller
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const res = {status: (code: number) => ({send: (res: unknown) => res})}
-
-        beforeEach(() => {
-            const goodConcepts = _.omit(testConcepts, ['bad_cast_favorite_color', 'bad_compare_favorite_color'])
-            engine = new ClaimsAdjudicator(goodConcepts)
-            controllers = claimsController(engine)
-        })
-
         it('will retrieve a collection of properties against which claims can be made', async () => {
             const expected = {
                 "metadata": {
@@ -218,10 +130,10 @@ describe('Claims Adjudicator Middleware', () => {
                         ]
                     }
                 ]
-            }
-            const actual = await controllers.claims.getConcepts({} as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const actual = await controllers.claims.getConcepts({} as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return a collection of claim validation responses', async () => {
             const req = {
@@ -271,7 +183,7 @@ describe('Claims Adjudicator Middleware', () => {
                         ]
                     }
                 }
-            }
+            };
             const expected = {
                 '1': {
                     'metadata': {
@@ -308,34 +220,34 @@ describe('Claims Adjudicator Middleware', () => {
                         }
                     }
                 }
-            }
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected)
+        });
 
         it('will return an empty response', async () => {
             const req = {
                 body: {}
-            }
-            const expected = {}
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const expected = {};
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return an empty response', async () => {
             const req = {
                 body: 'Bad Request'
-            }
-            const expected = {}
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const expected = {};
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return true claim verification responses', async () => {
-            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('t')))
+            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('t')));
             const req = {
                 body: claims
-            }
+            };
             const expected = {
                 "t1": {
                     "verified": true,
@@ -409,16 +321,16 @@ describe('Claims Adjudicator Middleware', () => {
                         }
                     }
                 }
-            }
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return false claim verification responses', async () => {
-            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('f')))
+            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('f')));
             const req = {
                 body: claims
-            }
+            };
             const expected = {
                 "f1": {
                     "verified": false,
@@ -492,16 +404,16 @@ describe('Claims Adjudicator Middleware', () => {
                         }
                     }
                 }
-            }
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return bad request error claim verification responses', async () => {
-            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('e_bad_request')))
+            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('e_bad_request')));
             const req = {
                 body: claims
-            }
+            };
             const expected = {
                 "e_bad_request_invalid_claim_object": {
                     "metadata": {
@@ -575,20 +487,20 @@ describe('Claims Adjudicator Middleware', () => {
                         }
                     }
                 }
-            }
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
+            };
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
 
         it('will return internal error claim verification responses', async () => {
-            const concepts = _.pick(testConcepts, ['subject_exists', 'bad_cast_favorite_color', 'bad_compare_favorite_color'])
-            engine = new ClaimsAdjudicator(concepts)
-            controllers = claimsController(engine)
+            const concepts = _.pick(testConcepts, ['subject_exists', 'bad_cast_favorite_color', 'bad_compare_favorite_color']);
+            engine = new ClaimsAdjudicator(concepts);
+            controllers = claimsController(engine);
 
-            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('e_internal')))
+            const claims = _.pick(testClaims, Object.keys(testClaims).filter(key => key.startsWith('e_internal')));
             const req = {
                 body: claims
-            }
+            };
 
             const expected = {
                 "e_internal_bad_compare": {
@@ -607,15 +519,15 @@ describe('Claims Adjudicator Middleware', () => {
                         }
                     }
                 }
-            }
-            const actual = await controllers.claims.validateClaims(req as Request, res as Response)
-            chai.assert.deepEqual(actual, expected)
-        })
-    })
+            };
+            const actual = await controllers.claims.validateClaims(req as Request, res as Response);
+            assert.deepEqual(actual, expected);
+        });
+    });
 
     describe('Metadata', () => {
         it('will return success', () => {
-            const actual = generateMetadataResponseObj(200)
+            const actual = generateMetadataResponseObj(200);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -623,25 +535,66 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Success"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return success', () => {
-            const actual = generateMetadataResponseObj(200, null)
+            const actual = generateMetadataResponseObj(200, 200);
             const expect = {
                 "metadata": {
                     "validation_response": {
                         "code": 200,
-                        "message": "Success"
+                        "message": "200"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return success', () => {
-            const actual = generateMetadataResponseObj(200, 'Successful')
+            const actual = generateMetadataResponseObj(200, null);
+            const expect = {
+                "metadata": {
+                    "validation_response": {
+                        "code": 200,
+                        "message": "Response is null"
+                    }
+                }
+            };
+            assert.deepEqual(actual, expect);
+        });
+
+        it('will return success', () => {
+            const actual = generateMetadataResponseObj(200, {});
+            const expect = {
+                "metadata": {
+                    "validation_response": {
+                        "code": 200,
+                        "message": "Response body is empty"
+                    }
+                }
+            };
+            assert.deepEqual(actual, expect);
+        });
+
+        it('will return success', () => {
+            const actual = generateMetadataResponseObj(200, {response: 'cool'});
+            const expect = {
+                "metadata": {
+                    "validation_response": {
+                        "code": 200,
+                        "message": {
+                            "response": "cool"
+                        }
+                    }
+                }
+            };
+            assert.deepEqual(actual, expect);
+        });
+
+        it('will return success', () => {
+            const actual = generateMetadataResponseObj(200, 'Successful');
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -649,12 +602,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Successful"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return created', () => {
-            const actual = generateMetadataResponseObj(201)
+            const actual = generateMetadataResponseObj(201);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -662,12 +615,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Created"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return created', () => {
-            const actual = generateMetadataResponseObj(204)
+            const actual = generateMetadataResponseObj(204);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -675,12 +628,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "No Content"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return bad request', () => {
-            const actual = generateMetadataResponseObj(400)
+            const actual = generateMetadataResponseObj(400);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -688,12 +641,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Bad Request"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return unauthorized', () => {
-            const actual = generateMetadataResponseObj(401)
+            const actual = generateMetadataResponseObj(401);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -701,12 +654,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Unauthorized"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return forbidden', () => {
-            const actual = generateMetadataResponseObj(403)
+            const actual = generateMetadataResponseObj(403);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -714,12 +667,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Forbidden"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return not found', () => {
-            const actual = generateMetadataResponseObj(404)
+            const actual = generateMetadataResponseObj(404);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -727,12 +680,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Not Found"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return conflict', () => {
-            const actual = generateMetadataResponseObj(409)
+            const actual = generateMetadataResponseObj(409);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -740,12 +693,12 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Conflict"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
 
         it('will return internal server error', () => {
-            const actual = generateMetadataResponseObj(500)
+            const actual = generateMetadataResponseObj(500);
             const expect = {
                 "metadata": {
                     "validation_response": {
@@ -753,21 +706,43 @@ describe('Claims Adjudicator Middleware', () => {
                         "message": "Internal Server Error"
                     }
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
-    })
+            };
+            assert.deepEqual(actual, expect);
+        });
+    });
 
     describe('Validation Response', () => {
         it('will return a 500 response for an invalid http response code', () => {
-            const actual = generateValidationResponseObj(700)
+            const actual = generateValidationResponseObj(700);
             const expect = {
                 "validation_response": {
                     "code": 500,
                     "message": "Internal Server Error"
                 }
-            }
-            chai.assert.deepEqual(actual, expect)
-        })
+            };
+            assert.deepEqual(actual, expect);
+        });
+    });
+
+    describe('Is Empty Object', () => {
+        it('will return true when input is null', () => {
+            const actual = isObjEmpty(null);
+            assert.isTrue(actual);
+        });
+
+        it('will return true when input is not an object', () => {
+            const actual = isObjEmpty('not an object');
+            assert.isTrue(actual);
+        });
+
+        it('will return true when the object has no properties', () => {
+            const actual = isObjEmpty({});
+            assert.isTrue(actual);
+        });
+
+        it('will return false when the object has at least one property', () => {
+            const actual = isObjEmpty({greet: 'hello'});
+            assert.isFalse(actual);
+        });
     })
-})
+});

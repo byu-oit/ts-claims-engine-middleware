@@ -1,20 +1,13 @@
-<h1 align="center">Claims Engine Middleware</h1>
-
-<p align="center">An Express middleware function to facilitate the rapid use of the <a href="https://github.com/byu-oit/ts-claims-engine">Claims Adjudicator Module (CAM)</a></p>
-
-<p align="center">
-    <a href="https://travis-ci.org/byu-oit/ts-claims-engine-middleware"><img alt="Build Status" src="https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master" /></a>
-    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/byu-oit/ts-claims-engine-middleware" />
-    <a href="https://prettier.io/"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier" /></a>
-</p>
-
-<br>
+# ts-claims-engine-middleware
+[![Build Status](https://travis-ci.org/byu-oit/ts-claims-engine-middleware.svg?branch=master)](https://travis-ci.org/byu-oit/ts-claims-engine-middleware)
+[![Coverage Status](https://coveralls.io/repos/github/byu-oit/ts-claims-engine-middleware/badge.svg?branch=master)](https://coveralls.io/github/byu-oit/ts-claims-engine-middleware?branch=master)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/byu-oit/ts-claims-engine-middleware)
 
 ## Installation
 `npm i @byu-oit/ts-claims-engine-middleware`
 
 ## Introduction
-The Claims Adjudicator Middleware is an _[express](https://expressjs.com)_ middleware function. It's purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
+The Claims Adjudicator Middleware is an _![express](https://expressjs.com)_ middleware function. It's purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
 
 ## Example
 
@@ -284,7 +277,7 @@ An example claim response (including both validation states and both error respo
 ## Appendix
 
 ### Related Packages
-* **[Claims Adjudicator Module (CAM)](https://github.com/byu-oit/ts-claims-engine)**
-* **[Claims Adjudicator Middleware](https://github.com/byu-oit/ts-claims-engine-middleware)**
-* **[Claims Adjudicator Client](https://github.com/byu-oit/ts-claims-engine-client)**
-* **[Claims Adjudicator WSO2 Request](https://github.com/byu-oit/ts-wso2-claims-request)**
+* **![Claims Adjudicator Module (CAM)](https://github.com/byu-oit/ts-claims-engine)**
+* **![Claims Adjudicator Middleware](https://github.com/byu-oit/ts-claims-engine-middleware)**
+* **![Claims Adjudicator Client](https://github.com/byu-oit/ts-claims-engine-client)**
+* **![Claims Adjudicator WSO2 Request](https://github.com/byu-oit/ts-wso2-claims-request)**

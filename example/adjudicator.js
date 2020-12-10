@@ -19,7 +19,7 @@ const subjects = {
     height: 5.8,
     favorite_color: 'red'
   }
-}
+};
 
 const concepts = { // Create concepts
   subject_exists: new Concept({
