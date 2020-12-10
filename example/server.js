@@ -1,5 +1,5 @@
 const express = require('express')
-const { middleware, EnforcerError } = require('@byu-oit/ts-claims-engine-middleware')
+const CAM = require('@byu-oit/ts-claims-engine-middleware')
 const adjudicator = require('./adjudicator')
 
 ;(async function () {
@@ -15,12 +15,8 @@ const adjudicator = require('./adjudicator')
   })
 
   // Implement claims middleware
-  const handleClaims = await middleware(adjudicator)
+  const handleClaims = await CAM.middleware(adjudicator)
   app.use('/claims', handleClaims)
-
-  // Using the enforcer error middleware catches errors made related to the request format
-  // If an error occurs that is not related to formatting, a 500 error response will be returned
-  app.use(EnforcerError)
 
   // Start server
   const port = process.env.PORT || 8080

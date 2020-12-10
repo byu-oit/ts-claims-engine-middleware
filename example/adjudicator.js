@@ -1,4 +1,4 @@
-const {ClaimsAdjudicator, Concept, Relationships} = require('@byu-oit/ts-claims-engine')
+const {ClaimsAdjudicator, Concept} = require('@byu-oit/ts-claims-engine')
 
 const subjects = {
   '123456789': {
@@ -21,14 +21,14 @@ const subjects = {
   }
 }
 
-const concepts = [ // Create concepts
-  Concept.Boolean({
-    name: 'subject_exists',
+const concepts = { // Create concepts
+  subject_exists: new Concept({
     description: 'The subject exists',
     longDescription: 'Determines whether a subject is a known entity within the domain.',
-    relationships: [Relationships.EQ, Relationships.NE],
+    type: 'boolean',
+    relationships: ['eq', 'not_eq'],
     qualifiers: ['age'],
-    async getValue (id, qualifiers) {
+    getValue: async (id, qualifiers) => {
       if (qualifiers && qualifiers.age) {
         return subjects[id] !== undefined && subjects[id].age === qualifiers.age
       } else {
@@ -36,15 +36,13 @@ const concepts = [ // Create concepts
       }
     }
   }),
-  Concept.Number({
-    name: 'age',
+  age: new Concept({
     description: 'The subject is of age',
     longDescription: 'Determine if the subject is of an age',
-    relationships: [Relationships.GT, Relationships.GTE, Relationships.LT, Relationships.LTE, Relationships.EQ, Relationships.NE],
-    async getValue (id) {
-      return subjects[id].age
-    }
+    type: 'int',
+    relationships: ['gt', 'gt_or_eq', 'lt', 'lt_or_eq', 'eq', 'not_eq'],
+    getValue: async (id) => subjects[id].age
   })
-]
+}
 
 module.exports = new ClaimsAdjudicator(concepts) // Export adjudicator instance
