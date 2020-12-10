@@ -62,3 +62,7 @@ typings/
 
 # Distribution folder
 dist/
+example/package-lock.json
+
+# IntelliJ
+.idea/
