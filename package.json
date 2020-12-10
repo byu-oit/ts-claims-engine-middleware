@@ -1,6 +1,6 @@
 {
   "name": "@byu-oit/ts-claims-engine-middleware",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "Claims engine middleware implementation in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
