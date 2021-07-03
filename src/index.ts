@@ -22,6 +22,6 @@ export async function middleware(adjudicator: ClaimsAdjudicator): Promise<Middle
     const enforcer = new Enforcer(path.resolve(__dirname, './api.json'))
     await enforcer.promise // wait for enforcer to resolve
 
-    await enforcer.controllers(controllers, adjudicator)
+    await enforcer.controllers(controllers(adjudicator))
     return enforcer.middleware()
 }
