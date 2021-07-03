@@ -1,6 +1,6 @@
 {
   "name": "@byu-oit/ts-claims-engine-middleware",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Claims engine middleware implementation in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,6 @@
     "copy": "cp src/api.json dist/",
     "coverage": "nyc report --reporter=json",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "prepublishOnly": "npm run build && npm test && npm run lint",
     "test": "nyc mocha -r ts-node/register -r source-map-support/register ./test/**/*-test.ts"
   },
   "files": [

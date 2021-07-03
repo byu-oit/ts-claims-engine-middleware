@@ -21,7 +21,7 @@
 <br>
 
 ## Introduction
-The Claims Adjudicator Middleware is an _[express](https://expressjs.com)_ middleware function. It's purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
+The Claims Adjudicator Middleware is an _[express](https://expressjs.com)_ middleware function. Its purpose is to make implementing the CAM as convenient as possible to developers already using the express server framework. It is assumed that those reading this already have a knowledge of the Claims Engine -- its use and implementation. To read more about the Claims Engine, visit the [Claims Adjudicator Module GitHub Repo](https://github.com/byu-oit/ts-claims-engine).
 
 <br>
 
